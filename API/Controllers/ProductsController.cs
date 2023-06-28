@@ -9,6 +9,7 @@ using System.Linq;
 using AutoMapper;
 using API.Errors;
 using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 
 namespace API.Controllers
 {
@@ -34,9 +35,10 @@ namespace API.Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ProductToReturnDto>>> GetProducts()
+    public async Task<ActionResult<IReadOnlyList<ProductToReturnDto>>> GetProducts(
+      string sort, int? brandId, int? typeId )
     {
-      var spec = new ProductsWithTypesAndBrandsSpecification();
+      var spec = new ProductsWithTypesAndBrandsSpecification(sort, brandId, typeId);
 
       var products = await _productsRepo.ListAsync(spec);
 
