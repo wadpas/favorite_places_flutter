@@ -1,20 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { IBrand } from '../shared/models/brand';
 import { IProduct } from '../shared/models/product';
 import { IType } from '../shared/models/productType';
+import { ShopParams } from '../shared/models/shopParams';
 import { ShopService } from './shop.service';
 
 @Component({
   selector: 'app-shop',
   templateUrl: './shop.component.html',
-  styleUrls: ['./shop.component.scss']
 })
 export class ShopComponent implements OnInit {
+  @ViewChild('search') searchTerm: ElementRef
   products: IProduct[]
   brands: IBrand[]
   types: IType[]
-  brandIdSelected: number = 0;
-  typeIdSelected: number = 0;
+  shopParams = new ShopParams()
+  totalCount: number
+  sortOptions = [
+    { name: 'Alphabetical', value: 'name' },
+    { name: 'Lowest Price', value: 'priceAsc' },
+    { name: 'Highest Price', value: 'priceDesc' }
+  ]
 
   constructor(private shopService: ShopService) { }
 
@@ -25,10 +31,12 @@ export class ShopComponent implements OnInit {
   }
 
   getProducts() {
-    this.shopService.getProducts(this.brandIdSelected, this.typeIdSelected).subscribe(response => {
+    this.shopService.getProducts(this.shopParams).subscribe(response => {
       this.products = response.data
+      this.shopParams.pageIndex = response.pageIndex
+      this.shopParams.pageSize = response.pageSize
+      this.totalCount = response.count
     }, error => { console.log(error) })
-
   }
 
   getBrands() {
@@ -44,12 +52,40 @@ export class ShopComponent implements OnInit {
   }
 
   onBrandSelected(brandId: number) {
-    this.brandIdSelected = brandId
+    this.shopParams.brandId = brandId
+    this.shopParams.pageIndex = 1
     this.getProducts()
   }
 
-  onTypeSelected(brandId: number) {
-    this.typeIdSelected = brandId
+  onTypeSelected(typeId: number) {
+    this.shopParams.typeId = typeId
+    this.shopParams.pageIndex = 1
+    this.getProducts()
+  }
+
+  onSortSelected(sort: string) {
+    this.shopParams.sort = sort;
+    this.getProducts()
+  }
+
+  onPageChanged(page: number) {
+    if (this.shopParams.pageIndex !== page) {
+      this.shopParams.pageIndex = page
+      this.getProducts()
+    }
+  }
+
+  onSearch() {
+    this.shopParams.search = this.searchTerm.nativeElement.value
+    this.shopParams.pageIndex = 1
+    this.getProducts()
+    console.log(this.shopParams.search);
+
+  }
+
+  onReset() {
+    this.searchTerm.nativeElement.value = ''
+    this.shopParams = new ShopParams()
     this.getProducts()
   }
 

@@ -18,7 +18,7 @@ import { ShopModule } from './shop/shop.module';
     BrowserAnimationsModule,
     HttpClientModule,
     CoreModule,
-    ShopModule
+    ShopModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
