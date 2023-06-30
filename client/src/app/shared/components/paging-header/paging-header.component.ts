@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-paging-header',
-  templateUrl: './paging-header.component.html',
+  templateUrl: './paging-header.component.html'
 })
+
 export class PagingHeaderComponent implements OnInit {
   @Input() pageIndex: number
   @Input() pageSize: number
