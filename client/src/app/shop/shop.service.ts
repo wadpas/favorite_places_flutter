@@ -3,45 +3,56 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { IBrand } from '../shared/models/brand';
 import { IPagination } from '../shared/models/pagination';
+import { IProduct } from '../shared/models/product';
 import { IType } from '../shared/models/productType';
 import { ShopParams } from '../shared/models/shopParams';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShopService {
-  baseURrl = 'https://localhost:5001/api/'
+  baseURrl = 'https://localhost:5001/api/';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getProducts(shopParams: ShopParams) {
-    let { brandId, typeId, sort, pageIndex, pageSize, search } = shopParams
-    let params = new HttpParams()
+    let { brandId, typeId, sort, pageIndex, pageSize, search } = shopParams;
+    let params = new HttpParams();
 
     if (brandId !== 0) {
-      params = params.append('brandId', brandId.toString())
+      params = params.append('brandId', brandId.toString());
     }
     if (typeId !== 0) {
-      params = params.append('typeId', typeId.toString())
+      params = params.append('typeId', typeId.toString());
     }
     if (search) {
-      params = params.append('search', search)
+      params = params.append('search', search);
     }
-    params = params.append('sort', sort)
-    params = params.append('pageIndex', pageIndex.toString())
-    params = params.append('pageSize', pageSize.toString())
+    params = params.append('sort', sort);
+    params = params.append('pageIndex', pageIndex.toString());
+    params = params.append('pageSize', pageSize.toString());
 
-    return this.http.get<IPagination>(this.baseURrl + 'products', { observe: 'response', params })
+    return this.http
+      .get<IPagination>(this.baseURrl + 'products', {
+        observe: 'response',
+        params,
+      })
       .pipe(
-        map(response => { return response.body }
-        )
-      )
+        map((response) => {
+          return response.body;
+        })
+      );
   }
+
+  getProduct(id: number) {
+    return this.http.get<IProduct>(this.baseURrl + 'products/' + id);
+  }
+
   getBrands() {
-    return this.http.get<IBrand[]>(this.baseURrl + 'products/brands')
+    return this.http.get<IBrand[]>(this.baseURrl + 'products/brands');
   }
 
   getTypes() {
-    return this.http.get<IType[]>(this.baseURrl + 'products/types')
+    return this.http.get<IType[]>(this.baseURrl + 'products/types');
   }
 }
