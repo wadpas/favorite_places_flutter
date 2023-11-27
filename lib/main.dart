@@ -1,4 +1,6 @@
+import 'package:favorite_places_flutter/screens/auth.dart';
 import 'package:favorite_places_flutter/screens/places.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,7 +51,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Great Places',
       theme: theme,
-      home: const PlacesScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.active) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.data == null) {
+            return const AuthScreen();
+          } else {
+            return const PlacesScreen();
+          }
+        },
+      ),
     );
   }
 }
