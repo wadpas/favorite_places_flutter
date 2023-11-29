@@ -1,6 +1,6 @@
+import 'package:favorite_places_flutter/providers/auth_provider.dart';
 import 'package:favorite_places_flutter/screens/auth.dart';
 import 'package:favorite_places_flutter/screens/places.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -43,28 +43,20 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authStateAsync = ref.watch(authStateChangesProvider);
+
     return MaterialApp(
-      title: 'Great Places',
       theme: theme,
-      home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.active) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.data == null) {
-            return const AuthScreen();
-          } else {
-            return const PlacesScreen();
-          }
-        },
+      home: authStateAsync.when(
+        data: (user) =>
+            user != null ? const PlacesScreen() : const AuthScreen(),
+        loading: () => const CircularProgressIndicator(),
+        error: (err, stack) => Text('Error: $err'),
       ),
     );
   }
